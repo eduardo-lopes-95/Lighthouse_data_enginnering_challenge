@@ -1,3 +1,6 @@
 .vscode/launch.json
 utils/__pycache__/bigquery.cpython-39.pyc
 utils/__pycache__/etl_pg.cpython-39.pyc
+.venv
+clear.sh
+.gitignore

@@ -1,5 +1,7 @@
 import logging
 from multiprocessing import parent_process
+import os
+import shutil
 import sys
 import pandas as pd
 import psycopg2
@@ -8,16 +10,17 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 def get_connect() -> psycopg2.connect:
     
+    conn = None
     params = {
         "port"      : 5432,
         "database"  : "northwind",
-        "user"      : "postgres",
-        "password"  : "admin"
+        "user"      : "northwind_user",
+        "password"  : "thewindisblowing"
     }
 
     try:
         logging.info('Connecting to PostgreSQL')
-        conn = psycopg2.connect(params)
+        conn = psycopg2.connect(**params)
     except (Exception, psycopg2.DatabaseError) as err:
         logging.info(f'Error: {err}')
         sys.exit(1)
@@ -25,9 +28,9 @@ def get_connect() -> psycopg2.connect:
 
     return conn
 
-def list_tables() -> list:
-
-    cursor = get_connect()
+def get_tables() -> list:
+    conn = get_connect()
+    cursor = conn.cursor()
     try:
         cursor.execute('''
                 SELECT 
@@ -47,12 +50,13 @@ def list_tables() -> list:
     
     return list(pd.DataFrame(all_tables)[0].unique())
 
-def list_columns() -> list:
-
-    cursor = get_connect()
+def get_columns(table: str) -> list:
+    
+    conn = get_connect()
+    cursor = conn.cursor()
 
     try:
-        cursor.execute('''
+        cursor.execute(f'''
             SELECT
                 column_name
             FROM
@@ -71,11 +75,14 @@ def list_columns() -> list:
     return list(pd.DataFrame(all_columns)[0].unique()) 
 
 def convert_postgres_dataframe(table: str) -> pd.DataFrame:
-    columns_name = list_columns()
-    columns_join = ', '.join()
+    
+    conn = get_connect()
+    cursor = conn.cursor()
+
+    columns_name = get_columns(table)
+    columns_join = ', '.join(columns_name)
     select_query =  f"SELECT {columns_join} FROM {table}"
 
-    cursor = get_connect()
     try:
         cursor.execute(select_query)
     except (Exception, psycopg2.DatabaseError) as err:
@@ -85,30 +92,28 @@ def convert_postgres_dataframe(table: str) -> pd.DataFrame:
     
     table = cursor.fetchall()
     cursor.close()
-    
-    df = pd.DataFrame(table, columns=columns_name)
+ 
     return pd.DataFrame(table, columns=columns_name)
 
-def extract_pg():
+def pg_to_csv_by_date(date:str):
     
-    tables = list_tables()
+    tables = get_tables()
 
     for table in tables:
-        path = f"northwind_local/{table}/{date}/"
+        path = f"northwind/{table}/{date}/"
         if not os.path.exists(path):
             os.makedirs(path)
         
-        column_names = list_columns(conn,table)
-        df = postgresql_to_dataframe(conn, table, column_names)
+        df = convert_postgres_dataframe(table)
         
         df.to_csv(path + f"{table}.csv",index=False)
-        print(f"{table} csv successfully saved in local disk")
+        logging.info(f"{table} csv has been stored.")
+        break
 
-    ## Extract .csv file
-    path_csv = f"northwind_local/order_details/{date}/"
+    path_csv = f"northwind/order_details/{date}/"
     if not os.path.exists(path_csv):
         os.makedirs(path_csv)
-    df_csv = pd.read_csv('./data/order_details.csv')
-    df_csv.to_csv(path_csv + f"order_details.csv",index=False)
+    
+    shutil.copy('./data/order_details.csv', path_csv)
 
-    return f"\nStep 1 done successfully to date: {date} \n"
+    return logging.info("Step 1 done.")

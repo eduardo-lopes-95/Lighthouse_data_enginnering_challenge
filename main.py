@@ -6,6 +6,14 @@ from utils.bigquery import load_data_to_bigquery
 from utils.etl_pg import pg_to_csv_by_date
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
+def validate_date(date: str) -> bool:
+    res = True
+    try:
+        res = bool(datetime.parser.isoparse(date))
+    except ValueError:
+        res = False
+    
+    return res
 
 params = input("Please enter something: ")
     
@@ -36,15 +44,3 @@ if params == '':
     logging.info("param 2 (optional): <YYYY-MM-DD>")
     logging.info("If date was not defined, its will consider current date")
 
-def validate_date(date: str) -> bool:
-    # using try-except to check for truth value
-    res = True
-    try:
-        res = bool(datetime.parser.isoparse(date))
-    except ValueError:
-        res = False
-    
-    return res
-
-if __name__ == "__main__":
-   main(sys.argv[1:])

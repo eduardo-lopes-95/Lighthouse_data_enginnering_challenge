@@ -1,8 +1,6 @@
 # code-challenge Breno Milagres
 Indicium code challenge for Software Developer focusing on data projects
 
-
-
 # Flowchart
 ![image](img/fluxo_pipe_indicium.png)
 
@@ -26,7 +24,7 @@ pip install -r ./requirements.txt
 ```
 
 ## Instructions on how to run the  pipeline
-- Execution pattern: 
+- Execution: 
     
     ```
     py main.py <Parameter 1> <Parameter 2>
@@ -34,7 +32,7 @@ pip install -r ./requirements.txt
     - **Parameter 1** (mandatory):
         - **-e**: to run only step 1 
         - **-l**: to run only step 2 
-        - **-enl**: to run steps 1 and 2
+        - **-b**: to run both steps
     - **Parameter 2** (optional):
         - date in format **YYYY-MM-DD**
         - If date was not defined, its will consider current date
@@ -45,17 +43,11 @@ pip install -r ./requirements.txt
 
         py main.py -l 2022-02-01
 
-        py main.py -enl
+        py main.py -b
 
 - If no parameter or a wrong parameter is passed, a help message will be printed:
 
 ![image](img/erro_parametros.png)
-
-## Dashboard DataStudio - Plus =)
-Final query scheduled in Data Studio
-
-
-link: https://datastudio.google.com/reporting/96c3d5b2-cc13-41f5-8d7c-c9a784a6c232
 
 ## Requirements
 

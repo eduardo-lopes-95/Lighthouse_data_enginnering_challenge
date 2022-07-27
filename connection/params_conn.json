@@ -1,6 +1,0 @@
-{
-    "port"      : 5432,
-    "database"  : "northwind",
-    "user"      : "postgres",
-    "password"  : "admin"
-}

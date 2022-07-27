@@ -1,5 +1,4 @@
 import logging
-from multiprocessing import parent_process
 import os
 import shutil
 import sys

@@ -3,3 +3,5 @@ bigquery
 pandas
 psycopg2
 datetime
+google-auth
+
